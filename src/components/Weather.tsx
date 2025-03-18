@@ -1,20 +1,29 @@
 import {useAppSelector} from "../app/hooks.ts";
+import {useGetWeatherByCityQuery} from "../features/api/weatherAPI.ts";
 
 const Weather = () => {
-    const message = useAppSelector(state => state.message);
-    const weather = useAppSelector(state => state.weatherInfo);
+    const city = useAppSelector(state => state.city);
+    const {data, isLoading, error} = useGetWeatherByCityQuery(city);
+    if(!city) {
+        return <div className={'infoWeath'}>Enter city name</div>
+    }
+    if(isLoading) {
+        return <div className={'infoWeath'}>...Pending</div>
+    }
+    if(error) {
+        return <div className={'infoWeath'}>Enter correct city name</div>
+    }
 
     return (
         <div className={'infoWeath'}>
-            {!message &&
+            {!!data &&
                 <>
-                    <p>Location: {weather.country}, {weather.city}</p>
-                    <p>Temp: {weather.temp}</p>
-                    <p>Pressure: {weather.pressure}</p>
-                    <p>Sunset: {new Date(weather.sunset).toLocaleTimeString()}</p>
+                    <p>Location: {data.country}, {data.city}</p>
+                    <p>Temp: {data.temp}</p>
+                    <p>Pressure: {data.pressure}</p>
+                    <p>Sunset: {new Date(data.sunset).toLocaleTimeString()}</p>
                 </>
             }
-            {message}
         </div>
     );
 }
